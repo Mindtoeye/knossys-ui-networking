@@ -47,7 +47,7 @@ export default class KHashTable {
    *
    */
   setItem (key, value) {
-    var previous = undefined;
+    let previous = undefined;
 
     if (this.hasItem(key)) {
       previous = this.items[key];
@@ -79,7 +79,7 @@ export default class KHashTable {
    */   
   removeItem (key) {
     if (this.hasItem(key)) {
-      previous = this.items[key];
+      let previous = this.items[key];
       this.length--;
       delete this.items[key];
       return previous;

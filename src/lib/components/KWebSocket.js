@@ -57,7 +57,16 @@ export default class KWebSocket {
   /**
    * 
    */
-  getsocket (){
+  getsocket () {
 	  return (this.websocket);
+  }
+
+  /**
+   * 
+   */
+  close () {
+    if (this.websocket!=null) {
+      this.websocket.close ();
+    }
   }
 }
