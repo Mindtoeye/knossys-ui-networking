@@ -1,0 +1,15 @@
+{
+  "name": "knossys-server",
+  "version": "1.0.0",
+  "description": "A drydock server to develop the ui glue code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.2.3"
+  }
+}

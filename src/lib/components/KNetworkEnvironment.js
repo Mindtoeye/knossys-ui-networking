@@ -23,17 +23,24 @@ export default class KNetworkEnvironment {
 
   /**
    * 
+   */
+  setSystemRoot (aHost) {
+    this.systemRoot=aHost+":"+this.systemPort;
+  }
+
+  /**
+   * 
    * @param aHost
    * @returns
    */
   configWebsocket (aHost) {
     var splitter=aHost.split (":");
+
     this.systemRoot=splitter[0] + ":" + this.systemPort;
   }
 
   /**
    * 
-   * @returns
    */
   getGateway () {
     return ("ws://"+this.systemRoot+"/websocket");
@@ -41,12 +48,14 @@ export default class KNetworkEnvironment {
 
   /**
    * 
-   * @returns
    */
   getUpload () {
     return ("http://"+this.systemRoot+"/upload");
   }
 
+  /**
+   * 
+   */
   setSession (aSession) {
 	  KnossysSession=aSession;
   }

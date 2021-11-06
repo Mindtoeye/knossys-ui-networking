@@ -1,30 +1,34 @@
 
-var argumentTypes = [
-  {
-    type: "string",
-    replace: "([a-z]+)",
-    transform: (arg) => {
-      return arg;
-    }
-  },
-  {
-    type: "number",
-    replace: "([0-9]+)",
-    transform: (arg) => {
-      return parseInt(arg);
-    }
-  }
-];
+import {types} from './ArgumentTypes';
 
 var commands = [
   {
     name: "help",
     scheme: "help",
     args:[],
+    pointer: null,
     handler: ({input}) => {
-      return "Usage: ";
+      return ("Usage: ");
     }
   },
+  {
+    name: "connect",
+    scheme: "connect",
+    args:[],
+    pointer: null,
+    handler: ({input}) => {
+      return ("Connecting ...");
+    }
+  },
+  {
+    name: "disconnect",
+    scheme: "disconnect",
+    args:[],
+    pointer: null,
+    handler: ({input}) => {
+      return ("Disconnecting ...");
+    }
+  },  
   {
     name: "echo",
     scheme: "echo $input",
@@ -34,8 +38,9 @@ var commands = [
       type: "string"
     }
     ],
+    pointer: null,
     handler: ({input}) => {
-      return input;
+      return (input);
     }
   },
   {
@@ -51,8 +56,9 @@ var commands = [
       type: "number"
     }
     ],
+    pointer: null,
     handler: ({val1, val2}) => {
-      return val1 + val2;
+      return (val1 + val2);
     }
   }
 ];
@@ -71,24 +77,31 @@ class KCommandParser {
     var argumentType = null;
 
     for(let c of commands) {
-    	var reg = c.scheme
+    	var reg = c.scheme;
+
     	for(let arg of c.args) {
-    		argumentType = argumentTypes.find(a => a.type === arg.type);
+    		argumentType = types.argumentTypes.find(a => a.type === arg.type);
+
     		if(argumentType === undefined) {
     			return ("unsupported argument type");
     		}
+
     		reg = reg.replace("$" + arg.name, argumentType.replace)
     	}
+
     	var regExp = new RegExp(reg);
     	var match = input.match(regExp);
 
     	if(match) {
     		match.shift();
+
     		var paramObj = {};
+
     		for(var i = 0; i < c.args.length; i++) {
-    			argumentType = argumentTypes.find(a => a.type === c.args[i].type);
+    			argumentType = types.argumentTypes.find(a => a.type === c.args[i].type);
     			paramObj[c.args[i].name] = argumentType.transform(match[i]);
     		}
+
     		return c.handler(paramObj);
     	}
     }

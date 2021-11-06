@@ -17,10 +17,14 @@ class KnossysConnector extends Component {
   constructor (props) {
     super(props);
 
+    this.networkConfig=new KNetworkEnvironment ();
+    this.networkConfig.setSystemRoot ("192.168.0.108");
+
     this.parser=new KCommandParser ();
     this.prompt="disconnected > ";
 
     this.state = {
+      connected: false,
       prompt: this.prompt,
       value: "",
       lines: [],
@@ -30,6 +34,20 @@ class KnossysConnector extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.setupEventHandlers = this.setupEventHandlers.bind(this);
+    this.handleWebsocketOpen = this.handleWebsocketOpen.bind(this);  
+    this.handleWebsocketData = this.handleWebsocketData.bind(this);    
+    this.handleWebsocketError = this.handleWebsocketError.bind(this);
+    this.handleWebsocketClose = this.handleWebsocketClose.bind(this);     
+  }
+
+  /**
+   * 
+   */
+  componentDidMount () {
+    console.log ("componentDidMount ()");
+
+    this.createWebSocket ();
   }
 
   /**
@@ -43,18 +61,16 @@ class KnossysConnector extends Component {
     }
   }
 
-
   /**
    * 
    */
-  createWebSocket () {           
-    var networkConfig=new KNetworkEnvironment ();
-    //networkConfig.configWebsocket (location.host);    
+  createWebSocket () {                     
+    console.log ("createWebSocket ("+this.networkConfig.getGateway ()+")");
       
-    console.log ("createWebSocket ("+networkConfig.getGateway ()+")");
-      
-    if (this.state.websocket==null) {      
-      var wssocket = new KWebSocket(networkConfig.getGateway ());
+    if (this.state.websocket==null) {
+      console.log ("websocket not yet available, initializing ...");
+
+      var wssocket = new WebSocket(this.networkConfig.getGateway ());
         
       var newWebSocket=new KWebSocket ();
       newWebSocket.setSocket (wssocket);
@@ -63,14 +79,21 @@ class KnossysConnector extends Component {
         websocket: newWebSocket,
         wsdata: {},
         wsretry: false
-      }, () => {
-        this.state.websocket.getsocket ().addEventListener('open', this.handleWebsocketOpen.bind(this));  
-        this.state.websocket.getsocket ().addEventListener('message', this.handleWebsocketData.bind(this));    
-        this.state.websocket.getsocket ().addEventListener('error', this.handleWebsocketError.bind(this));
-        this.state.websocket.getsocket ().addEventListener('close', this.handleWebsocketClose.bind(this));               
-      });
+      },this.setupEventHandlers);
     }
   } 
+
+  /**
+   *
+   */
+  setupEventHandlers () {
+    console.log ("setupEventHandlers ()");
+
+    this.state.websocket.getsocket ().addEventListener('open', this.handleWebsocketOpen);
+    this.state.websocket.getsocket ().addEventListener('message', this.handleWebsocketData);
+    this.state.websocket.getsocket ().addEventListener('error', this.handleWebsocketError);
+    this.state.websocket.getsocket ().addEventListener('close', this.handleWebsocketClose);
+  }
   
   /**
    * Note: the incoming data is already parsed data
@@ -78,8 +101,13 @@ class KnossysConnector extends Component {
   handleWebsocketOpen(event) {
     console.log ("handleWebsocketOpen ()");
     
-    this.setState({connected: true, wsdata: null, wsretry: false}, () => {
-      this.state.websocket.sendData ("root.react.init", {});
+    this.setState({
+      connected: true, 
+      wsdata: null, 
+      wsretry: false
+      }, () => {
+        console.log ("Connected, sending initial packet ...");
+        this.state.websocket.sendData ("root.react.init", {});
     });
   }    
   
@@ -90,8 +118,8 @@ class KnossysConnector extends Component {
    * inner blocks.
    */
   handleWebsocketData(event) {  
-    //console.log ("handleWebsocketData ()");
-    //console.log ("Data: " + event.data);
+    console.log ("handleWebsocketData ()");
+    console.log ("Data: " + event.data);
     
     var JSONObject=JSON.parse (event.data);
     
@@ -121,6 +149,37 @@ class KnossysConnector extends Component {
         */
       });
     }  
+  }  
+
+  /**
+   * 
+   */
+  retryWebsocketConnection () {
+    console.log ("retryWebsocketConnection ()");
+
+    if (this.state.wsretry==true) {
+      return;
+    }
+         
+    this.setState({connected: false}, () => {  
+      this.setState ({websocket:null, wsretry: true}, () => {
+        setTimeout(this.createWebSocket.bind(this), 5000);    
+      })
+    });      
+  }
+
+  /** 
+   * @param {any} data
+   */
+  handleWebsocketError(data) {    
+    //this.retryWebsocketConnection ();
+  }  
+    
+  /** 
+   * @param {any} data
+   */
+  handleWebsocketClose(data) {     
+    //this.retryWebsocketConnection ();
   }  
 
   /**
@@ -166,11 +225,18 @@ class KnossysConnector extends Component {
       if (i>0) {
         result=result+ ", ";
       }
-      let singleCmd=splitter [i];
+      let singleCmd=splitter[i];
       result=result + this.parser.cmd (singleCmd.trim ());
     }
 
     return (result);
+  }
+
+  /**
+   *
+   */
+  send (aString) {
+    this.state.websocket.sendData ("root.react.init", {"data": aString});
   }
   
   /**
@@ -186,6 +252,9 @@ class KnossysConnector extends Component {
     }
 
     return (<div className="genericWindow" style={{'left' : '50px', 'top': '50px'}}>
+        <div className="consoletitle">
+        Knossys Drydock thin client window
+        </div>
         <div className="consoleContent">
         {lineElements}
         </div>
