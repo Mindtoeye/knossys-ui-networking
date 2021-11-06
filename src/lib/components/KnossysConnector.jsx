@@ -18,10 +18,11 @@ class KnossysConnector extends Component {
     super(props);
 
     this.parser=new KCommandParser ();
-    this.prompt="> ";
+    this.prompt="disconnected > ";
 
     this.state = {
-      value: this.prompt,
+      prompt: this.prompt,
+      value: "",
       lines: [],
       websocket: null,
       wsdata: {},
@@ -131,7 +132,8 @@ class KnossysConnector extends Component {
     if (checker.indexOf ("\n")!==-1) {
       let newLines=this.state.lines;
       let oneliner=checker.replace(/(\r\n|\n|\r)/gm, "");
-      let clean=oneliner.substring (2);
+      //let clean=oneliner.substring (2);
+      let clean=oneliner;
       
       newLines.push (clean);
 
@@ -140,14 +142,10 @@ class KnossysConnector extends Component {
       newLines.push (result);
 
       this.setState({
-        value: this.prompt,
+        value: "",
         lines: newLines
       });
       return;
-    }
-
-    if (checker.length<2) {
-      checker="> ";
     }
 
     this.setState({
@@ -192,7 +190,9 @@ class KnossysConnector extends Component {
         {lineElements}
         </div>
         <div className="kconsole">
-          <div className="kconsoleprompt">{this.state.prompt}</div>
+          <div className="kconsoleprompt">
+            {this.state.prompt}
+          </div>
           <textarea className="kconsoleinput" value={this.state.value} onChange={this.handleChange} rows="1" />
         </div>
       </div>);    
