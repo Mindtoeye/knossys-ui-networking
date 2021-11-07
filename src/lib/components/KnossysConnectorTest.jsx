@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import KGUID from './KGUID';
-//import KQueue from './KQueue';
 import KConsoleTools from './KConsoleTools';
 import KAbstractConsole from './KAbstractConsole';
 import KConsoleContent from './KConsoleContent';
@@ -38,7 +37,7 @@ class KnossysConnectorTest extends Component {
    * 
    */
   componentDidMount () {
-    console.log ("componentDidMount ()");
+    //console.log ("componentDidMount ()");
 
     if (this.props.connector) {
       this.props.connector.registerConnection (this.state.id);

@@ -70,15 +70,13 @@ class KnossysConsole extends Component {
    * 
    */
   componentDidUpdate(prevProps) {
-    //console.log ("componentDidUpdate ()");
-
     if (this.props.data !== prevProps.data) {
       this.println (this.props.data);
     }
   }  
 
   /**
-   * https://stackoverflow.com/questions/37620694/how-to-scroll-to-bottom-in-react
+   * 
    */
   handleChange(event) {
     let checker=event.target.value;
