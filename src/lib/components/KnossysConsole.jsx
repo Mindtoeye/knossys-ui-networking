@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 
 import KGUID from './KGUID';
+//import KQueue from './KQueue';
 import KConsoleTools from './KConsoleTools';
 import KCommandParser from './KCommandParser';
+import KAbstractConsole from './KAbstractConsole';
+import KConsoleContent from './KConsoleContent';
 
 import './styles/main.scss';
 
@@ -21,14 +24,17 @@ class KnossysConsole extends Component {
     this.prompt="disconnected > ";
     this.guidGenerator=new KGUID ();  
 
-    this.showTimestamps=true;
     this.consoleTools=new KConsoleTools ();
+
+    this.queue=new KAbstractConsole ();
+    this.queue.setQueueSize (200);
 
     this.state = {
       id: this.guidGenerator.guid,
       prompt: this.prompt,
       value: "",
-      lines: []
+      lines: [],
+      showTimestamps: true
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -64,10 +70,7 @@ class KnossysConsole extends Component {
    * 
    */
   componentDidUpdate(prevProps) {
-    console.log ("componentDidUpdate ()");
-
-    console.log ("New data: " + this.props.data);
-    console.log ("Prev data: " + prevProps.data);
+    //console.log ("componentDidUpdate ()");
 
     if (this.props.data !== prevProps.data) {
       this.println (this.props.data);
@@ -85,11 +88,11 @@ class KnossysConsole extends Component {
       let clean=oneliner;
       
       this.println (clean,() => {
-        let newLines=this.state.lines;
-        let result=this.interpretCommand (clean);
-        newLines.push (result);
+        let result=this.interpretCommand (clean);        
+        this.queue.println (result);
         this.setState({      
-          lines: newLines
+          value: "",
+          lines: this.queue.getQueue ()
         });
       });
 
@@ -125,36 +128,23 @@ class KnossysConsole extends Component {
    *
    */
   println (aLine,aCallback) {
-    console.log ("println ("+aLine+")");
+    this.queue.println (aLine);
 
-    let newLines=this.state.lines;
-
-    if (this.showTimestamps===true) {
-      let timestamp=this.consoleTools.getTimestamp ();
-      newLines.push ("[" + timestamp + "] " + aLine);
-    } else {
-      newLines.push (aLine);
-    }
-
-    this.setState({
-      value: "",
-      lines: newLines
-    },() => {
-      if (aCallback) {
-        aCallback ();
-      }
+    this.setState({      
+      lines: this.queue.getQueue()
     });
+
+    if (aCallback) {
+      aCallback ();
+    }    
   }
 
   /**
    *
    */
   send (aString) {
-    console.log ("send ()");
-
-    //this.state.websocket.sendData ("root.react.init", {"data": aString});
-    if (this.connector) {
-      this.connector.send ("Hello World");
+    if (this.props.connector) {
+      this.props.connector.send ("Hello World");
     }
   }
   
@@ -162,21 +152,11 @@ class KnossysConsole extends Component {
    *
    */
   render () {
-    let lines=this.state.lines;
-    let lineElements=[];
-    let i;
-
-    for (i=0;i<lines.length;i++) {
-      lineElements.push (<p key={"kconsole-line-"+i} className="kconsoleline">{lines[i]}</p>);
-    }
-
-    return (<div className="genericWindow" style={{'left' : '50px', 'top': '50px'}}>
+    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px'}}>
         <div className="consoletitle">
         Knossys Drydock thin client window
         </div>
-        <div className="consoleContent">
-        {lineElements}
-        </div>
+        <KConsoleContent lines={this.state.lines} showTimestamps={this.state.showTimestamps} />
         <div className="kconsole">
           <div className="kconsoleprompt">
             {this.state.prompt}

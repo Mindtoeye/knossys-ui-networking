@@ -29,6 +29,9 @@ class KnossysConnector {
     this.handleWebsocketData = this.handleWebsocketData.bind(this);    
     this.handleWebsocketError = this.handleWebsocketError.bind(this);
     this.handleWebsocketClose = this.handleWebsocketClose.bind(this);     
+
+    this.createWebSocket = this.createWebSocket.bind (this);
+    this.shutdown = this.shutdown.bind (this);
   }
 
   /**
@@ -161,6 +164,8 @@ class KnossysConnector {
    * 
    */
   registerConnection (anId) {
+    console.log ("registerConnection ("+anId+")");
+
     this.connectionTable.setItem (anId,{});
 
     this.debugConnections ();
@@ -170,6 +175,8 @@ class KnossysConnector {
    * 
    */
   unregisterConnection (anId) {
+    console.log ("unregisterConnection ("+anId+")");
+    
     this.connectionTable.removeItem (anId);
 
     this.debugConnections ();
