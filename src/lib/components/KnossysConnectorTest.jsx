@@ -65,7 +65,7 @@ class KnossysConnectorTest extends Component {
    * 
    */
   componentDidUpdate(prevProps) {
-    console.log ("componentDidUpdate ()");
+    //console.log ("componentDidUpdate ()");
 
     if (this.props.data !== prevProps.data) {
       this.println ("Data: " + this.props.data);

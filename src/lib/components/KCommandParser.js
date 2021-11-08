@@ -1,9 +1,9 @@
 
 import {types} from './ArgumentTypes';
+import KConsoleCommand from './KConsoleCommand';
 
 var commands = [
   {
-    name: "help",
     scheme: "help",
     args:[],
     pointer: null,
@@ -12,25 +12,6 @@ var commands = [
     }
   },
   {
-    name: "connect",
-    scheme: "connect",
-    args:[],
-    pointer: null,
-    handler: ({input}) => {
-      return ("Connecting ...");
-    }
-  },
-  {
-    name: "disconnect",
-    scheme: "disconnect",
-    args:[],
-    pointer: null,
-    handler: ({input}) => {
-      return ("Disconnecting ...");
-    }
-  },  
-  {
-    name: "echo",
     scheme: "echo $input",
     args:[
     {
@@ -44,7 +25,6 @@ var commands = [
     }
   },
   {
-    name: "sum",
     scheme: "sum $val1 $val2",
     args:[
     {
@@ -71,12 +51,78 @@ class KCommandParser {
   /**
    * 
    */
+  constructor () {
+    this.addCommand ("echo $input",[{name: "input",type: "string"}]);
+  } 
+
+  /**
+   * 
+   */
+  addCommand (aScheme,argsObject) {
+    let newCommand=new KConsoleCommand ();
+    newCommand.scheme=aScheme;
+    newCommand.args=argsObject;
+    commands.push (newCommand);
+  }
+
+  /**
+   * 
+   */
+  splitParts (input) {
+    let matches= input.match(/[^"]*|"[^"]*"/g);
+    let parts=[];
+
+    console.log (matches);
+
+    for (let i=0;i<matches.length;i++) {
+      let quoteless=matches [i].replace(/['"]+/g,'');
+      let clean=quoteless.toLowerCase ();
+      if (clean === "") {
+        // we might need this for something
+      } else {
+        parts.push (clean);
+      }
+    }
+
+    console.log (parts);
+
+    return (parts);
+  }
+
+  /**
+   * 
+   */
+  cmd (input) {
+    console.log ("cmd ("+input+")");
+ 
+    let parts=this.splitParts (input);
+
+    if (parts.length==0) {
+      return ("no matching command found");
+    }
+
+    let command=parts [0];
+
+    parts.splice (0,1);
+
+    console.log ("Command is: " + command);
+
+    return ("no matching command found");
+  }
+
+  /**
+   * 
+   */
+  /* 
 	cmd (input) {
     console.log ("cmd ("+input+")");
+ 
+    var parts=this.splitParts (input);
 
     var argumentType = null;
 
     for(let c of commands) {
+
     	var reg = c.scheme;
 
     	for(let arg of c.args) {
@@ -108,6 +154,7 @@ class KCommandParser {
 
     return ("no matching command found");
   }
+  */
 }
 
 export default KCommandParser;

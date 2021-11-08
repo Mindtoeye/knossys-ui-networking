@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import KGUID from './KGUID';
-//import KQueue from './KQueue';
+import KQueue from './KQueue';
 import KConsoleTools from './KConsoleTools';
 import KCommandParser from './KCommandParser';
 import KAbstractConsole from './KAbstractConsole';
@@ -29,8 +29,12 @@ class KnossysConsole extends Component {
     this.queue=new KAbstractConsole ();
     this.queue.setQueueSize (200);
 
+    this.history=new KQueue ();
+    this.history.setQueueSize (200);
+
     this.state = {
       id: this.guidGenerator.guid,
+      historyIndex: 0,
       prompt: this.prompt,
       value: "",
       lines: [],
@@ -38,6 +42,7 @@ class KnossysConsole extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.keyDown = this.keyDown.bind(this);
   }
 
   /**
@@ -85,10 +90,13 @@ class KnossysConsole extends Component {
       let oneliner=checker.replace(/(\r\n|\n|\r)/gm, "");
       let clean=oneliner;
       
+      this.history.enqueue(clean);
+
       this.println (clean,() => {
         let result=this.interpretCommand (clean);        
-        this.queue.println (result);
+        this.queue.println (result);        
         this.setState({      
+          historyIndex: (this.queue.getQueue().length-1),
           value: "",
           lines: this.queue.getQueue ()
         });
@@ -100,6 +108,43 @@ class KnossysConsole extends Component {
     this.setState({
       value: checker
     });  
+  }
+
+  /**
+   * 
+   */
+  keyDown (e) {
+    if (e.keyCode===38) {
+      let queue=this.history.getQueue ();
+      let index=this.state.historyIndex;
+
+      index--;
+      if (index<0) {
+        index=0;
+      }
+
+      this.setState ({
+        historyIndex: index,
+        value: queue[index]
+      });
+      return;
+    }
+
+    if (e.keyCode===40) {
+      let queue=this.history.getQueue ();
+      let index=this.state.historyIndex;
+
+      index++;
+      if (index>(queue.length-1)) {
+        index=queue.length-1;
+      }
+
+      this.setState ({
+        historyIndex: index,
+        value: queue[index]
+      });
+      return;
+    }
   }  
 
   /**
@@ -159,7 +204,7 @@ class KnossysConsole extends Component {
           <div className="kconsoleprompt">
             {this.state.prompt}
           </div>
-          <textarea className="kconsoleinput" value={this.state.value} onChange={this.handleChange} rows="1" />
+          <textarea className="kconsoleinput" value={this.state.value} onKeyDown={this.keyDown} onChange={this.handleChange} rows="1" />
         </div>
       </div>);    
   }

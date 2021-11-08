@@ -49,6 +49,7 @@ class KnossysConnector {
   shutdown() {      
     if (this.websocket!=null) {
       this.websocket.close ();
+      this.websocket=null;
     }
   }
 
@@ -176,7 +177,7 @@ class KnossysConnector {
    */
   unregisterConnection (anId) {
     console.log ("unregisterConnection ("+anId+")");
-    
+
     this.connectionTable.removeItem (anId);
 
     this.debugConnections ();
@@ -193,7 +194,9 @@ class KnossysConnector {
    *
    */
   send (aString) {
-    this.websocket.sendData ("root.react.init", {"data": aString});
+    if (this.websocket!=null) {
+      this.websocket.sendData ("root.react.init", {"data": aString});
+    }
   }
 }
 
