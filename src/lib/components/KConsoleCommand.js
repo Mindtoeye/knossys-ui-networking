@@ -9,8 +9,9 @@ class KConsoleCommand {
    */  
   constructor () {
     this.scheme="nop";
+    this.schemeParts=[];
     this.args=[];
-    this.pointer=null;
+    this.command="";
     this.handler=({input}) => {
       return ("Usage: ");
     }

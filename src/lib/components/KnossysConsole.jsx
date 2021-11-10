@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import KGUID from './KGUID';
 import KQueue from './KQueue';
 import KConsoleTools from './KConsoleTools';
-import KCommandParser from './KCommandParser';
 import KAbstractConsole from './KAbstractConsole';
 import KConsoleContent from './KConsoleContent';
 
@@ -20,7 +19,7 @@ class KnossysConsole extends Component {
   constructor (props) {
     super(props);
 
-    this.parser=new KCommandParser ();
+    this.parser=props.parser;
     this.prompt="disconnected > ";
     this.guidGenerator=new KGUID ();  
 
@@ -43,6 +42,7 @@ class KnossysConsole extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.keyDown = this.keyDown.bind(this);
+    this.clearScreen = this.clearScreen.bind(this);
   }
 
   /**
@@ -56,6 +56,9 @@ class KnossysConsole extends Component {
     } else {
       this.println ("Error: no connector available to register connection");
     }
+
+    this.parser.addCommand ("clear", (aValue) => {this.clearScreen ();});
+    this.parser.addCommand ("showtimestamps $boolean", (toggle) => { this.setState ({showTimestamps: toggle}); return ("set 'showTimestamps' to: " + toggle); });
   }
 
   /**
@@ -83,6 +86,16 @@ class KnossysConsole extends Component {
   /**
    * 
    */
+  clearScreen () {
+    console.log ("clearScreen ()");
+    this.setState({
+      lines:[]
+    });
+  }
+
+  /**
+   * 
+   */
   handleChange(event) {
     let checker=event.target.value;
 
@@ -93,13 +106,15 @@ class KnossysConsole extends Component {
       this.history.enqueue(clean);
 
       this.println (clean,() => {
-        let result=this.interpretCommand (clean);        
-        this.queue.println (result);        
-        this.setState({      
-          historyIndex: (this.queue.getQueue().length-1),
-          value: "",
-          lines: this.queue.getQueue ()
-        });
+        let result=this.interpretCommand (clean);
+        if (result) {
+          this.queue.println (result);        
+          this.setState({      
+            historyIndex: (this.queue.getQueue().length-1),
+            value: "",
+            lines: this.queue.getQueue ()
+          });
+        }
       });
 
       return;
@@ -153,6 +168,10 @@ class KnossysConsole extends Component {
   interpretCommand (aCommandString) {
     console.log ("interpretCommand ("+aCommandString+")");
 
+    if (this.props.parser==null) {
+      return ("Error: no command interpreter provided");
+    }
+
     let splitter=aCommandString.split (";");
     let result="";
 
@@ -161,7 +180,7 @@ class KnossysConsole extends Component {
         result=result+ ", ";
       }
       let singleCmd=splitter[i];
-      result=result + this.parser.cmd (singleCmd.trim ());
+      result=result + this.props.parser.cmd (singleCmd.trim ());
     }
 
     return (result);
@@ -194,12 +213,12 @@ class KnossysConsole extends Component {
   /**
    *
    */
-  render () {
+  render () {    
     return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px'}}>
         <div className="consoletitle">
         Knossys Drydock thin client window
         </div>
-        <KConsoleContent lines={this.state.lines} showTimestamps={this.state.showTimestamps} />
+        <KConsoleContent lines={this.state.lines} showtimestamps={this.state.showTimestamps} />
         <div className="kconsole">
           <div className="kconsoleprompt">
             {this.state.prompt}

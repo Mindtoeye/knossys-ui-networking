@@ -10,6 +10,15 @@ class KConsoleContent extends Component {
   /**
    *
    */
+  /* 
+  constructor (props) {
+    super (props);
+  }
+  */
+
+  /**
+   *
+   */
   componentDidMount() {
     this.scrollToBottom();
   }
@@ -36,13 +45,14 @@ class KConsoleContent extends Component {
     let lines=this.props.lines;
     let lineElements=[];
     let i;
-
-    if (this.props.showtimestamps) {
+    
+    if (this.props.hasOwnProperty ("showtimestamps")===true) {
       showtimestamps=this.props.showtimestamps;
     }
 
     for (i=0;i<lines.length;i++) {
       let consoleLine=lines[i];
+
       if (showtimestamps===true) {
         lineElements.push (<p key={"kconsole-line-"+i} className="kconsoleline"><span className="kcolor-yellow">[</span><span className="kcolor-green">{consoleLine.timestamp}</span><span className="kcolor-yellow">]</span>{consoleLine.line}</p>);
       } else {

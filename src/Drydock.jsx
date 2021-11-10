@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+import KCommandParser from './lib/components/KCommandParser';
 import KnossysConsole from './lib/components/KnossysConsole';
 import KnossysConnector from './lib/components/KnossysConnector';
 import KnossysConnectorTest from './lib/components/KnossysConnectorTest';
@@ -18,6 +19,11 @@ class Drydock extends Component {
     super (props);
 
     let connector=new KnossysConnector (this);
+
+    this.parser=new KCommandParser ();
+    this.parser.addCommand ("echo $string", (input) => { return (input)});
+    this.parser.addCommand ("help", () => { return ("Usage: ")});
+    this.parser.addCommand ("sum $number $number",  (input1,input2) => { return (input1+input2)});
 
     this.state = {
       connector: connector,
@@ -62,7 +68,7 @@ class Drydock extends Component {
   render () {
     return (
       <div className="desktopContent">
-        <KnossysConsole connector={this.state.connector} data={this.state.data} x={50} y={50} />
+        <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} />
         <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} />
       </div>
     );

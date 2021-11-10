@@ -1,6 +1,5 @@
 import KNetworkEnvironment from './KNetworkEnvironment';
 import KWebSocket from './KWebSocket';
-import KCommandParser from './KCommandParser';
 import KHashTable from './KHashTable';
 
 /**
@@ -21,8 +20,8 @@ class KnossysConnector {
     this.connectionTable=new KHashTable ();
 
     this.networkConfig=new KNetworkEnvironment ();
+    this.networkConfig.setSystemPort (8072);
     this.networkConfig.setSystemRoot ("192.168.0.108");
-    this.parser=new KCommandParser ();
 
     this.setupEventHandlers = this.setupEventHandlers.bind(this);
     this.handleWebsocketOpen = this.handleWebsocketOpen.bind(this);  

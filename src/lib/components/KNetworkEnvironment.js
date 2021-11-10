@@ -11,8 +11,8 @@ export default class KNetworkEnvironment {
    * 
    */	
   constructor () {
-    this.systemPort="8080";
-	  this.systemRoot="127.0.0.1:"+this.systemPort;
+    this.systemPort=8080;
+    this.systemHost="127.0.0.1";
 	
 	  var guidGenerator=new KGUID ();  
 	   
@@ -24,8 +24,15 @@ export default class KNetworkEnvironment {
   /**
    * 
    */
+  setSystemPort (aPort) {
+    this.systemPort=aPort;
+  }
+
+  /**
+   * 
+   */
   setSystemRoot (aHost) {
-    this.systemRoot=aHost+":"+this.systemPort;
+    this.systemHost=aHost;
   }
 
   /**
@@ -36,21 +43,22 @@ export default class KNetworkEnvironment {
   configWebsocket (aHost) {
     var splitter=aHost.split (":");
 
-    this.systemRoot=splitter[0] + ":" + this.systemPort;
+    this.systemHost=splitter[0];
+    this.systemPort=parseInt (splitter[1]);
   }
 
   /**
    * 
    */
   getGateway () {
-    return ("ws://"+this.systemRoot+"/websocket");
+    return ("ws://"+this.systemHost+":"+this.systemPort+"/websocket");
   }
 
   /**
    * 
    */
   getUpload () {
-    return ("http://"+this.systemRoot+"/upload");
+    return ("http://"+this.systemHost+":"+this.systemPort+"/upload");
   }
 
   /**
