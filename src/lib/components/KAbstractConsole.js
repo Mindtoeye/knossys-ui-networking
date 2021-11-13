@@ -15,6 +15,16 @@ class KAbstractConsole extends KQueue {
     newLine.setLine (aLine);
     this.enqueue (newLine);
   }
+
+  /**
+   * 
+   */
+  error (aLine) {
+    let newLine=new KAbstractConsoleLine ();
+    newLine.setLine (aLine);
+    newLine.setError (true);
+    this.enqueue (newLine);
+  }  
 }
 
 export default KAbstractConsole;

@@ -265,15 +265,9 @@ class KnossysConnector {
           return (statusResult);           
         }
 
-        console.log ("here");
-
-        console.log (statusResult);
-
         return (statusResult);
       }
     }
-
-    console.log ("Not connected");
 
     statusResult.ok=false;
     statusResult.statusMessage="Not connected";

@@ -12,6 +12,7 @@ class KAbstractConsoleLine {
   constructor() {    
     this.timestamp="";
     this.line="";
+    this.error=false;
   }
 
   /**
@@ -21,6 +22,13 @@ class KAbstractConsoleLine {
     let consoleTools=new KConsoleTools ();
     this.timestamp=consoleTools.getTimestamp ();
     this.line=aLine;
+  }
+
+  /**
+   * 
+   */
+  setError (aValue) {
+    this.error=aValue;
   }
 }
 

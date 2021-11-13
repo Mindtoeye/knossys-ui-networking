@@ -86,6 +86,17 @@ class KnossysConnectorTest extends Component {
   /**
    *
    */
+  error (aLine) {
+    this.queue.error (aLine);    
+
+    this.setState({      
+      lines: this.queue.getQueue()
+    });    
+  }  
+
+  /**
+   *
+   */
   send (aString) {
     if (this.props.connector) {      
       this.println (aString);
@@ -93,12 +104,12 @@ class KnossysConnectorTest extends Component {
       let sendStatus=this.props.connector.send (aString);
       
       if (sendStatus.ok==false) {
-        this.println (sendStatus.statusMessage);
+        this.error (sendStatus.statusMessage);
       } else {
         this.println (sendStatus.statusMessage);
       }
     } else {
-      this.println ("Unable to send, no connector");
+      this.error ("Unable to send, no connector");
     }
   }
 

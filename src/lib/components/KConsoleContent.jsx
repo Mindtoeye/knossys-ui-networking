@@ -52,9 +52,14 @@ class KConsoleContent extends Component {
 
     for (i=0;i<lines.length;i++) {
       let consoleLine=lines[i];
+      let aLine=consoleLine.line;
+
+      if (consoleLine.error==true) {
+        aLine=<span className="kcolor-red">{consoleLine.line}</span>;
+      }
 
       if (showtimestamps===true) {
-        lineElements.push (<p key={"kconsole-line-"+i} className="kconsoleline"><span className="kcolor-yellow">[</span><span className="kcolor-green">{consoleLine.timestamp}</span><span className="kcolor-yellow">]</span>{consoleLine.line}</p>);
+        lineElements.push (<p key={"kconsole-line-"+i} className="kconsoleline"><span className="kcolor-yellow">[</span><span className="kcolor-green">{consoleLine.timestamp}</span><span className="kcolor-yellow">]</span>{aLine}</p>);
       } else {
         lineElements.push (<p key={"kconsole-line-"+i} className="kconsoleline">{consoleLine.line}</p>);
       }
