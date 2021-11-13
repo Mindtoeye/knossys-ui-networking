@@ -47,7 +47,9 @@ class KnossysConnector {
    */
   shutdown() {      
     if (this.websocket!=null) {
+      console.log ("Closing ...")
       this.websocket.close ();
+      console.log ("Disabling ...")
       this.websocket=null;
     }
   }
@@ -85,7 +87,61 @@ class KnossysConnector {
     this.websocket.getsocket ().addEventListener('error', this.handleWebsocketError);
     this.websocket.getsocket ().addEventListener('close', this.handleWebsocketClose);
   }
-  
+
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
+   */  
+  stateToString (aState) {
+    console.log ("stateToString ("+aState+")");
+
+    if (aState==0 ) {
+      return ("CONNECTING"); // Socket has been created. The connection is not yet open.
+    }
+
+    if (aState==1) {
+      return ("OPEN"); // The connection is open and ready to communicate.
+    }
+
+    if (aState==2) {
+      return ("CLOSING") // The connection is in the process of closing.
+    }
+
+    if (aState==3) {
+      return ("CLOSED"); //  The connection is closed or couldn't be opened.
+    }
+
+    return ("UNDETERMINED");
+  }
+
+  /**
+   * 
+   */
+  isConnected () {
+    if (this.websocket.getsocket ().readyState==1) {
+      return (true);
+    }
+
+    return (false);
+  }
+
+  /**
+   * 
+   */
+  debugConnections () {
+    console.log (JSON.stringify (this.connectionTable.getItems ()));
+  }  
+
+  /**
+   * 
+   */
+  getStatus () {
+    let statusString="";
+
+    statusString+="Connected to: " + this.networkConfig.getGateway () + ", status: " + this.stateToString (this.websocket.getsocket ().readyState) + ", retry: " + this.wsretry;
+
+    return (statusString);
+  }
+
   /**
    * Note: the incoming data is already parsed data
    */
@@ -135,6 +191,12 @@ class KnossysConnector {
   retryWebsocketConnection () {
     console.log ("retryWebsocketConnection ()");
 
+    // Forcefully disconnected or not initialized yet
+    if (this.websocket==null) {
+      console.log ("Forcefully disconnected or not initialized yet");
+      return;
+    }
+
     if (this.wsretry===true) {
       return;
     }
@@ -183,19 +245,39 @@ class KnossysConnector {
   }
 
   /**
-   * 
-   */
-  debugConnections () {
-    console.log (JSON.stringify (this.connectionTable.getItems ()));
-  } 
-
-  /**
-   *
+   * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
    */
   send (aString) {
+    console.log ("send ("+aString+")");
+
+    let statusResult = {
+      ok: true,
+      statusMessage: "Send successful"
+    };
+
     if (this.websocket!=null) {
-      this.websocket.sendData ("root.react.init", {"data": aString});
+      if (this.isConnected ()==true) {
+        try {
+          this.websocket.sendData ("root.react.init", {"data": aString});
+        } catch (error) {
+          statusResult.ok=false;
+          statusResult.statusMessage=JSON.stringify (error);
+          return (statusResult);           
+        }
+
+        console.log ("here");
+
+        console.log (statusResult);
+
+        return (statusResult);
+      }
     }
+
+    console.log ("Not connected");
+
+    statusResult.ok=false;
+    statusResult.statusMessage="Not connected";
+    return (statusResult);          
   }
 }
 

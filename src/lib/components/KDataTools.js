@@ -35,7 +35,7 @@ class KDataTools {
     for (var key in aParameters) {
       if (aParameters.hasOwnProperty(key)) {
          if (key==aParameter) {
-           aParameters [aParameter].value=aValue;
+           aParameters[aParameter].value=aValue;
          }
       }
     }      
@@ -59,22 +59,22 @@ class KDataTools {
    */	
   parameterJSONtoArray (anObjectMap) {
   	//console.log ("parameterJSONtoArray ()");
-      //console.log ("Parameter object: " + JSON.stringify (anObjectMap));
+    //console.log ("Parameter object: " + JSON.stringify (anObjectMap));
       
-  	var newArray=new Array ();
+  	var newArray=[];
   	
   	for (var key in anObjectMap) {
-        if (anObjectMap.hasOwnProperty(key)) {
-          if (key!="dummy") {
-  		  //console.log(key + " -> " + JSON.stringify (anObjectMap[key]));
-  		  var parameterObject=new Object ();
-  		  parameterObject.parameter=key;
-  		  parameterObject.value=anObjectMap [key];
+      if (anObjectMap.hasOwnProperty(key)) {
+        if (key!="dummy") {
+  		    //console.log(key + " -> " + JSON.stringify (anObjectMap[key]));
+  		    var parameterObject={};
+  		    parameterObject.parameter=key;
+  		    parameterObject.value=anObjectMap[key];
   		  
-  		  newArray.push (parameterObject);
-      	    }  
-        }
+  		    newArray.push (parameterObject);
+        }  
       }
+    }
   	
   	return(newArray);
   }
@@ -83,15 +83,15 @@ class KDataTools {
    * 
    */
   parameterArrayToJSON (anArray) {
-  	var parameterObject=new Object ();  
+  	var parameterObject={};  
   	  
   	for (var i=0;i<anArray.length;i++) {
-  	  var testObject=anArray [i];
+  	  var testObject=anArray[i];
   	  
   	  if (testObject.path) {
-  	    parameterObject [testObject.parameter]=testObject.path;
+  	    parameterObject[testObject.parameter]=testObject.path;
   	  } else {
-  		  parameterObject [testObject.parameter]=testObject.value;
+  		  parameterObject[testObject.parameter]=testObject.value;
   	  }
   	} 
   	
@@ -104,16 +104,6 @@ class KDataTools {
   jsonToTable (tablejson) {
 	  return (this.parameterJSONtoArray (tablejson));
   }
-
-  /**
-   *
-   */
-  uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }  
 
   /**
    *

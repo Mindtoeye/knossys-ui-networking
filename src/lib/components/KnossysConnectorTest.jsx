@@ -87,9 +87,16 @@ class KnossysConnectorTest extends Component {
    *
    */
   send (aString) {
-    if (this.props.connector) {
-      this.props.connector.send (aString);
+    if (this.props.connector) {      
       this.println (aString);
+
+      let sendStatus=this.props.connector.send (aString);
+      
+      if (sendStatus.ok==false) {
+        this.println (sendStatus.statusMessage);
+      } else {
+        this.println (sendStatus.statusMessage);
+      }
     } else {
       this.println ("Unable to send, no connector");
     }
@@ -99,7 +106,7 @@ class KnossysConnectorTest extends Component {
    *
    */
   ping () {
-    this.send("ping " + this.counter);
+    let sendStatus=this.send("ping " + this.counter);
     this.counter=this.counter+1;
   }
   
@@ -107,7 +114,7 @@ class KnossysConnectorTest extends Component {
    *
    */
   render () {
-    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px'}}>
+    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
         <div className="consoletitle">
         Knossys Drydock automated connector test
         </div>

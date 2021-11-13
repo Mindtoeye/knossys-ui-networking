@@ -20,7 +20,7 @@ class KnossysConsole extends Component {
     super(props);
 
     this.parser=props.parser;
-    this.prompt="disconnected > ";
+    //this.prompt="conn: ? > ";
     this.guidGenerator=new KGUID ();  
 
     this.consoleTools=new KConsoleTools ();
@@ -34,7 +34,7 @@ class KnossysConsole extends Component {
     this.state = {
       id: this.guidGenerator.guid,
       historyIndex: 0,
-      prompt: this.prompt,
+      prompt: "conn: ? > ",
       value: "",
       lines: [],
       showTimestamps: true
@@ -43,6 +43,7 @@ class KnossysConsole extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.keyDown = this.keyDown.bind(this);
     this.clearScreen = this.clearScreen.bind(this);
+    this.showStatus = this.showStatus.bind(this);
   }
 
   /**
@@ -57,7 +58,8 @@ class KnossysConsole extends Component {
       this.println ("Error: no connector available to register connection");
     }
 
-    this.parser.addCommand ("clear", (aValue) => {this.clearScreen ();});
+    this.parser.addCommand ("clear", () => {this.clearScreen (); return (null); });
+    this.parser.addCommand ("status", () => {this.showStatus (); return (null); });
     this.parser.addCommand ("showtimestamps $boolean", (toggle) => { this.setState ({showTimestamps: toggle}); return ("set 'showTimestamps' to: " + toggle); });
   }
 
@@ -81,6 +83,12 @@ class KnossysConsole extends Component {
     if (this.props.data !== prevProps.data) {
       this.println (this.props.data);
     }
+
+    if (this.props.connector.connected!=prevProps.connector.connected) {
+      this.setState ({
+        prompt: "conn: "+this.props.connector.connected+" > "
+      });
+    }
   }  
 
   /**
@@ -88,9 +96,18 @@ class KnossysConsole extends Component {
    */
   clearScreen () {
     console.log ("clearScreen ()");
+    this.queue.reset();
     this.setState({
       lines:[]
     });
+  }
+
+  /**
+   * 
+   */
+  showStatus () {
+    console.log ("showStatus ()");
+    this.println (this.props.connector.getStatus ());
   }
 
   /**
@@ -109,12 +126,12 @@ class KnossysConsole extends Component {
         let result=this.interpretCommand (clean);
         if (result) {
           this.queue.println (result);        
-          this.setState({      
-            historyIndex: (this.queue.getQueue().length-1),
-            value: "",
-            lines: this.queue.getQueue ()
-          });
-        }
+        } 
+        this.setState({      
+          historyIndex: (this.queue.getQueue().length-1),
+          value: "",
+          lines: this.queue.getQueue ()
+        });
       });
 
       return;
@@ -180,7 +197,14 @@ class KnossysConsole extends Component {
         result=result+ ", ";
       }
       let singleCmd=splitter[i];
-      result=result + this.props.parser.cmd (singleCmd.trim ());
+      let r=this.props.parser.cmd (singleCmd.trim ());
+      if (r!=null) {
+        result=result + r;
+      }
+    }
+
+    if (result=="") {
+      return (null);
     }
 
     return (result);
@@ -214,7 +238,7 @@ class KnossysConsole extends Component {
    *
    */
   render () {    
-    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px'}}>
+    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
         <div className="consoletitle">
         Knossys Drydock thin client window
         </div>

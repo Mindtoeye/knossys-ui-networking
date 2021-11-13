@@ -22,7 +22,8 @@ class Drydock extends Component {
 
     this.parser=new KCommandParser ();
     this.parser.addCommand ("echo $string", (input) => { return (input)});
-    this.parser.addCommand ("help", () => { return ("Usage: ")});
+    this.parser.addCommand ("connect", () => { this.wbConnect(); return ("Connecting ..."); });
+    this.parser.addCommand ("disconnect", () => { this.wbDisonnect(); return ("Disconnecting ..."); });
     this.parser.addCommand ("sum $number $number",  (input1,input2) => { return (input1+input2)});
 
     this.state = {
@@ -30,24 +31,43 @@ class Drydock extends Component {
       updateTrigger: 1,
       data: null
     };
+
+    this.wbConnect = this.wbConnect.bind(this);
+    this.wbDisonnect = this.wbDisonnect.bind(this);
   }
 
   /**
    * 
    */
   componentDidMount () {
-    console.log ("componentDidMount ()");
-
-    this.state.connector.init ();
+    this.wbConnect ();
   }
 
   /**
    * 
    */
   componentWillUnmount() {      
+    this.wbDisonnect ();
+  }
+
+  /**
+   * 
+   */
+  wbConnect () {
+    console.log("");
+    if (this.state.connector!=null) {
+      this.state.connector.init ();
+    }    
+  }
+
+  /**
+   * 
+   */
+  wbDisonnect () {
+    console.log("wbDisonnect ()");
     if (this.state.connector!=null) {
       this.state.connector.shutdown ();
-    }
+    }    
   }
 
   /**
@@ -68,8 +88,8 @@ class Drydock extends Component {
   render () {
     return (
       <div className="desktopContent">
-        <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} />
-        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} />
+        <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} width={500} height={450} />
+        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} width={500} height={450} />
       </div>
     );
   }

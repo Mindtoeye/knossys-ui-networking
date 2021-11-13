@@ -16,6 +16,19 @@ class KCommandParser {
 
     this.dataTools=new DataTools ();
     this.commands = [];
+
+    this.addCommand ("help", () => { 
+      let commandList="Known commands: ";
+
+      for (let i=0;i<this.commands.length;i++) {
+        if (i>0) {
+          commandList = (commandList + ", ");
+        }
+        commandList = commandList + this.commands[i].command;
+      }
+
+      return (commandList);
+    });
   } 
 
   /**

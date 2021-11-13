@@ -17,6 +17,16 @@ class KQueue {
   /**
    * 
    */
+  reset () {
+    this.queue = [];
+    this.tail = 0;
+    this.head = 0;
+    this.queueSize=0; // no size limit    
+  }
+
+  /**
+   * 
+   */
   setQueueSize (aSize) {
     this.queueSize=aSize;
   }
