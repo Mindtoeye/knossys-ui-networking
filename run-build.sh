@@ -11,8 +11,5 @@ if [ ! -d "node_modules" ]; then
   exit
 fi
 
-echo "Starting websocket server ..."
-
-cd dist
-node bundle.js
-cd ..
+export NODE_OPTIONS=--openssl-legacy-provider
+npm run build

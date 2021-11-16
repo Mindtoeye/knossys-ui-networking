@@ -1,47 +1,25 @@
 import WebSocket, { WebSocketServer } from 'ws';
 
-import KMessageObject from '../../lib/components/KMessageObject';
+import KUIServer from '../../lib/components/KUIServer';
 
-console.log ("Starting ...");
+// https://github.com/websockets/ws/blob/master/doc/ws.md
 
-let testMessage=new KMessageObject ();
-testMessage.process ("hello");
+console.log ("Starting server ...");
 
-/*
-const wss = new WebSocketServer({
-  port: 8080,
-  perMessageDeflate: {
-    zlibDeflateOptions: {
-      // See zlib defaults.
-      chunkSize: 1024,
-      memLevel: 7,
-      level: 3
-    },
-    zlibInflateOptions: {
-      chunkSize: 10 * 1024
-    },
-    // Other options settable:
-    clientNoContextTakeover: true, // Defaults to negotiated value.
-    serverNoContextTakeover: true, // Defaults to negotiated value.
-    serverMaxWindowBits: 10, // Defaults to negotiated value.
-    // Below options specified as default values.
-    concurrencyLimit: 10, // Limits zlib concurrency for perf.
-    threshold: 1024 // Size (in bytes) below which messages
-    // should not be compressed if context takeover is disabled.
-  }
-});
-
-*/
-
+const server = new KUIServer ();
 const wss = new WebSocketServer({ port: 8072 });
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function message(data) {    
-    let newMessage=new KMessageObject ();
-    newMessage.process (data);
-  });
+/**
+ *
+ */
+function sendMessage (aMessage) {
 
-  ws.send('something');
+}
+
+wss.on('connection', function connection(ws, req) {
+  ws.on('message', function message(data) {    
+    server.processData (this,data);
+  });
 });
 
 /*

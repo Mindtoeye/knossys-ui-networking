@@ -1,57 +1,71 @@
 {
-  "name": "@cmu-eberly-center/eberly-react-library-template",
-  "description": "A repo to test CMU Eberly component code and to prepare components for exporting as npm libraries",
-  "author": "mindtoeye",
-  "keywords": ["react", "components", "ui"],
-  "version": "0.1.0",
-  "private": false,
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [ "dist", "README.md" ],
+  "name": "VirtualDesktopDrydock",
+  "version": "1.0.0",
+  "description": "Development and testing of the Proscenium desktop paradigm",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress --config webpack.config.js",
+    "dev-build": "webpack --progress -d --config webpack.config.js",
+    "watch": "webpack --progress -d --config webpack.config.js --watch",
+    "start": "webpack-dev-server --mode development --progress --config webpack.config.js --host 0.0.0.0 --port 8081"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CMUEberlyCenter/eberly-npm-component-test.git"
+    "url": "git+https://github.com/Knossys/AccordionPropertySheet.git"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "test": "react-scripts test",
-    "sass": "node-sass src/lib/components/styles/main.scss src/App.css -w",
-    "build": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files",
-    "eject": "react-scripts eject"
+  "keywords": [
+    "react",
+    "npm",
+    "webpack"
+  ],
+  "author": "Knossys",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Knossys/AccordionPropertySheet/wiki"
+  },
+  "homepage": "https://github.com/Knossys/AccordionPropertySheet/wiki",
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-react": "^7.16.0",
+    "@emotion/css": "^11.5.0",
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.3",
+    "css-loader": "^6.5.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "is-hotkey": "^0.1.6",
+    "react": "^16.9.0",
+    "react-dom": "^16.12.0",
+    "react-json-tree": "^0.11.2",
+    "sass": "^1.43.4",
+    "sass-loader": "^12.3.0",
+    "slate": "^0.47.8",
+    "slate-react": "^0.22.9",
+    "webpack": "^5.64.1",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.3.1"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
-    "node-sass": "^5.0.0",
-    "web-vitals": "^1.0.1"
-  },
-  "devDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.13.14",
-    "@babel/preset-env": "^7.13.12"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/react-fontawesome": "^0.1.5",
+    "bootstrap": "^4.3.1",
+    "history": "^4.10.1",
+    "immutable": "^4.0.0-rc.12",
+    "rc-slider": "^8.7.1",
+    "react-ace": "^7.0.4",
+    "react-bootstrap": "^1.0.0-beta.12",
+    "react-cytoscapejs": "^1.2.0",
+    "react-datepicker": "^2.10.1",
+    "react-draggable": "^4.0.3",
+    "react-editable-svg-label": "^2.0.3",
+    "react-portal": "^4.2.0",
+    "react-router-dom": "^4.3.1",
+    "react-tabs": "^3.0.0",
+    "slate-editor": "^5.1.1",
+    "style-loader": "^1.0.0"
   }
 }

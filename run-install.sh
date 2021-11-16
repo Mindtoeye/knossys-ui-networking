@@ -1,0 +1,2 @@
+clear
+npm install
