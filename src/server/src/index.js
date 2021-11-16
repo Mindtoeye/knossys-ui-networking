@@ -1,8 +1,11 @@
 import WebSocket, { WebSocketServer } from 'ws';
 
-// https://github.com/websockets/ws
+import KMessageObject from '../../lib/components/KMessageObject';
 
 console.log ("Starting ...");
+
+let testMessage=new KMessageObject ();
+testMessage.process ("hello");
 
 /*
 const wss = new WebSocketServer({
@@ -30,11 +33,12 @@ const wss = new WebSocketServer({
 
 */
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 8072 });
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function message(data) {
-    console.log('received: %s', data);
+  ws.on('message', function message(data) {    
+    let newMessage=new KMessageObject ();
+    newMessage.process (data);
   });
 
   ws.send('something');

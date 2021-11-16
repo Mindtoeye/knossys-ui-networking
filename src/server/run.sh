@@ -7,4 +7,6 @@ fi
 
 echo "Starting websocket server ..."
 
-node index.js
+cd dist
+node bundle.js
+cd ..

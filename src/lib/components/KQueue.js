@@ -34,6 +34,13 @@ class KQueue {
   /**
    * 
    */
+  getSize () {
+    return (this.queue.length);
+  }
+
+  /**
+   * 
+   */
   getQueue () {
     return (this.queue);
   }

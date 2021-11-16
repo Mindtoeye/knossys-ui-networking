@@ -1,6 +1,9 @@
+
 import KNetworkEnvironment from './KNetworkEnvironment';
 import KWebSocket from './KWebSocket';
 import KHashTable from './KHashTable';
+import KQueue from './KQueue';
+import KMessageOBject from './KMessageObject';
 
 /**
  * 
@@ -12,12 +15,13 @@ class KnossysConnector {
    */
   constructor (masterController) {
 
-    this.controller=masterController;
+    //this.controller=masterController;
     this.websocket=null;
     this.wsdata={};
     this.wsretry=false;
 
     this.connectionTable=new KHashTable ();
+    this.messageQueue=new KQueue ();
 
     this.networkConfig=new KNetworkEnvironment ();
     this.networkConfig.setSystemPort (8072);
@@ -157,35 +161,6 @@ class KnossysConnector {
   }    
   
   /**
-   * Note: the incoming data is a basic string. Something we might
-   * want to consider is to fix escaped double quotes. We're seeing
-   * that some of the Java code is doing escaping on some of the
-   * inner blocks.
-   */
-  handleWebsocketData(event) {  
-    console.log ("handleWebsocketData ()");
-    console.log ("Data: " + event.data);
-
-    if (this.controller) {
-      this.controller.onData (event.data);
-    }
-    
-    /*
-    var JSONObject=JSON.parse (event.data);
-    
-    if (!JSONObject.data.namespace) {
-      console.log ("Internal error: incoming message does not conform to specs");  
-      return; 
-    }
-       
-    if (this.processWSMessage (JSONObject)===false) {    
-      this.setState({wsdata: JSONObject},() => {
-      });
-    }
-    */ 
-  }  
-
-  /**
    * 
    */
   retryWebsocketConnection () {
@@ -242,6 +217,44 @@ class KnossysConnector {
     this.connectionTable.removeItem (anId);
 
     this.debugConnections ();
+  }
+
+  /**
+   * Note: the incoming data is a basic string. Something we might
+   * want to consider is to fix escaped double quotes. We're seeing
+   * that some of the Java code is doing escaping on some of the
+   * inner blocks.
+   */
+  handleWebsocketData(event) {  
+    console.log ("handleWebsocketData ()");
+    console.log ("Data: " + event.data);
+
+    let incomingMessage=new KMessageOBject ();
+    incomingMessage.process (event.data);
+
+    this.messageQueue.enqueue (incomingMessage);
+
+    console.log ("Currently " + this.messageQueue.getSize () + " message in the queue");
+
+    /*
+    if (this.controller) {
+      this.controller.onData (event.data);
+    }
+    */
+    
+    /*
+    var JSONObject=JSON.parse (event.data);
+    
+    if (!JSONObject.data.namespace) {
+      console.log ("Internal error: incoming message does not conform to specs");  
+      return; 
+    }
+       
+    if (this.processWSMessage (JSONObject)===false) {    
+      this.setState({wsdata: JSONObject},() => {
+      });
+    }
+    */ 
   }
 
   /**

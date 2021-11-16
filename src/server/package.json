@@ -1,0 +1,21 @@
+{
+  "name": "knossys-server",
+  "version": "1.0.0",
+  "description": "A drydock server to develop the ui glue code",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "Martin van Velsen",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "webpack": "^5.64.1",
+    "webpack-cli": "^4.9.1",
+    "ws": "^8.2.3",
+    "bufferutil": "^4.0.5",
+    "utf-8-validate": "^5.0.7"    
+  }
+}
