@@ -21,6 +21,7 @@ class KMessageObject {
     this.namespace = "";
     this.session = "",
     this.payload = null;
+    this.count= 0;
   }
 
   /**
@@ -59,6 +60,7 @@ class KMessageObject {
     let aMessage={};
     aMessage.namespace=this.namespace;
     aMessage.session=this.session;
+    aMessage.count=this.count;
     aMessage.payload={
       payload: "pong"
     };

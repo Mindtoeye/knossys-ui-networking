@@ -88,8 +88,9 @@ class Drydock extends Component {
   render () {
     return (
       <div className="desktopContent">
-        <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} width={500} height={450} />
-        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} width={500} height={450} />
+        <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} width={500} height={400} />
+        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} width={500} height={400} />
+        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={50} y={460} width={500} height={400} />
       </div>
     );
   }

@@ -44,6 +44,7 @@ class KnossysConsole extends Component {
     this.keyDown = this.keyDown.bind(this);
     this.clearScreen = this.clearScreen.bind(this);
     this.showStatus = this.showStatus.bind(this);
+    this.generateBroadcast = this.generateBroadcast.bind(this);
   }
 
   /**
@@ -60,6 +61,7 @@ class KnossysConsole extends Component {
 
     this.parser.addCommand ("clear", () => {this.clearScreen (); return (null); });
     this.parser.addCommand ("status", () => {this.showStatus (); return (null); });
+    this.parser.addCommand ("broadcast $string", (aString) => {return (this.generateBroadcast (aString));});
     this.parser.addCommand ("showtimestamps $boolean", (toggle) => { this.setState ({showTimestamps: toggle}); return ("set 'showTimestamps' to: " + toggle); });
   }
 
@@ -232,6 +234,15 @@ class KnossysConsole extends Component {
     if (this.props.connector) {
       this.props.connector.send ("Hello World");
     }
+  }
+
+  /**
+   *
+   */
+  generateBroadcast (aString) {
+    if (this.props.connector) {
+      this.props.connector.send ("Hello World");
+    }    
   }
   
   /**

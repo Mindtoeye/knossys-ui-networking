@@ -230,7 +230,7 @@ class KnossysConnector {
     console.log ("Data: " + event.data);
 
     let incomingMessage=new KMessageOBject ();
-    incomingMessage.process (event.data);
+    incomingMessage.process (event);
 
     this.messageQueue.enqueue (incomingMessage);
 
@@ -272,6 +272,36 @@ class KnossysConnector {
       if (this.isConnected ()==true) {
         try {
           this.websocket.sendData ("root.react.init", {"data": aString});
+        } catch (error) {
+          statusResult.ok=false;
+          statusResult.statusMessage=JSON.stringify (error);
+          return (statusResult);           
+        }
+
+        return (statusResult);
+      }
+    }
+
+    statusResult.ok=false;
+    statusResult.statusMessage="Not connected";
+    return (statusResult);          
+  }
+
+  /**
+   * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
+   */
+  broadcast (aString) {
+    console.log ("broadcast ("+aString+")");
+
+    let statusResult = {
+      ok: true,
+      statusMessage: "Send successful"
+    };
+
+    if (this.websocket!=null) {
+      if (this.isConnected ()==true) {
+        try {
+          this.websocket.sendData ("*", {"data": aString});
         } catch (error) {
           statusResult.ok=false;
           statusResult.statusMessage=JSON.stringify (error);
