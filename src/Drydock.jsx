@@ -39,6 +39,15 @@ class Drydock extends Component {
   /**
    * 
    */
+  route (aRefId,aMessage) {
+    console.log ("route ("+aRefId+")");
+
+    //this.refs[aRefId].onMessage (aMessage);
+  }
+
+  /**
+   * 
+   */
   componentDidMount () {
     this.wbConnect ();
   }
@@ -54,7 +63,7 @@ class Drydock extends Component {
    * 
    */
   wbConnect () {
-    console.log("");
+    console.log("wbConnect ()");
     if (this.state.connector!=null) {
       this.state.connector.init ();
     }    
@@ -86,11 +95,15 @@ class Drydock extends Component {
    *
    */
   render () {
+    let consoleTests=[];
+
+    consoleTests.push(<KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} width={500} height={400} />);
+    consoleTests.push(<KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={50} y={460} width={500} height={400} />);
+
     return (
       <div className="desktopContent">
         <KnossysConsole parser={this.parser} connector={this.state.connector} data={this.state.data} x={50} y={50} width={500} height={400} />
-        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={600} y={50} width={500} height={400} />
-        <KnossysConnectorTest connector={this.state.connector} data={this.state.data} x={50} y={460} width={500} height={400} />
+        {consoleTests}
       </div>
     );
   }

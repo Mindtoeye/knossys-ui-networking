@@ -1,5 +1,5 @@
 import KNetworkEnvironment from './KNetworkEnvironment';
-//import KGUID from './KGUID';
+import KMessageObject from './KMessageObject';
 
 /**
  * 
@@ -15,6 +15,7 @@ export default class KWebSocket {
 	  var globalNetworkConfig=new KNetworkEnvironment ();
 	 
 	  this.sessionID=globalNetworkConfig.getSession ();
+    this.messageCount=0;
   }
       
   /**
@@ -22,31 +23,22 @@ export default class KWebSocket {
    */
   sendData (aNamespace,aData) {
 	  if (this.websocket!=null) {
-      var newData={};
-	    newData["data"]={};
-	    newData["data"]["namespace"] = aNamespace;
-	    newData["data"]["session"] = this.sessionID;
-	    newData["data"]["payload"] = aData;
-		    
-      this.websocket.send(JSON.stringify (newData));		 
+      let outgoing=new KMessageObject ();
+      outgoing.namespace=aNamespace;
+      outgoing.session=this.sessionID;
+      outgoing.count=this.messageCount;
+      outgoing.payload=aData;
+
+      let built=outgoing.build();
+
+      //console.log ("Sending: " + built);
+
+      this.websocket.send(built);
+
+      this.messageCount++;
 	  }  
   }
-   
-  /**
-   * 
-   */
-  sendNamespace (aNamespace) {
-	  if (this.websocket!=null) {
-      var newData={};
-	    newData["data"]={};
-	    newData["data"]["namespace"] = aNamespace;
-	    newData["data"]["session"] = this.sessionID;
-	    newData["data"]["payload"] = {};
-		    
-      this.websocket.send(JSON.stringify (newData));		 
-	  }  
-  }   
-   
+      
   /**
    * 
    */

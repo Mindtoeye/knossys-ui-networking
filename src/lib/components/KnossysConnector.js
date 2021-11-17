@@ -1,4 +1,5 @@
 
+import KGUID from './KGUID';
 import KNetworkEnvironment from './KNetworkEnvironment';
 import KWebSocket from './KWebSocket';
 import KHashTable from './KHashTable';
@@ -13,14 +14,14 @@ class KnossysConnector {
   /**
    * 
    */
-  constructor (masterController) {
+  constructor (aController) {
 
-    //this.controller=masterController;
+    this.reactController=aController;
     this.websocket=null;
     this.wsdata={};
     this.wsretry=false;
 
-    this.referenceCounter=1; // 0 is reserved
+    this.guidGenerator=new KGUID ();    
 
     this.connectionTable=new KHashTable ();
     this.messageQueue=new KQueue ();
@@ -95,8 +96,7 @@ class KnossysConnector {
 
     try {
       url=new URL (aURL);
-    }
-    catch(err) {
+    } catch(err) {
       statusResult.ok=false;
       statusResult.statusMessage="Error parsing url: " + err;
       return (statusResult);      
@@ -108,15 +108,6 @@ class KnossysConnector {
     statusResult.ok=true;
     statusResult.statusMessage="Changed server url, you may have to reconnect for this setting to take effect";
     return (statusResult);   
-  }
-
-  /**
-   * 
-   */
-  getReference () {
-    let ref="kref-"+this.referenceCounter;
-    this.referenceCounter++;
-    return (ref);
   }
 
   /**
@@ -192,13 +183,6 @@ class KnossysConnector {
   /**
    * 
    */
-  debugConnections () {
-    console.log (JSON.stringify (this.connectionTable.getItems ()));
-  }  
-
-  /**
-   * 
-   */
   getStatus () {
     let statusString="";
 
@@ -218,7 +202,8 @@ class KnossysConnector {
     this.wsretry=false;
     
     console.log ("Connected, sending initial packet ...");
-    this.websocket.sendData ("root.react.init", {});    
+
+    this.websocket.sendData (this.refId, {});    
   }    
   
   /**
@@ -259,6 +244,26 @@ class KnossysConnector {
   }  
 
   /**
+   * Essentially a shortcut to registerConnection
+   */
+  getReference () {    
+    let ref=this.guidGenerator.generate ();
+    this.registerConnection (ref);
+    return (ref);
+  }
+
+  /**
+   * 
+   */
+  debugConnections () {
+    let keys=this.connectionTable.getItems ();
+
+    for (var key in keys) {
+      console.log ('Registered connection/endpoint: ' + key);
+    }
+  }
+
+  /**
    * 
    */
   registerConnection (anId) {
@@ -287,42 +292,27 @@ class KnossysConnector {
    * inner blocks.
    */
   handleWebsocketData(event) {  
-    console.log ("handleWebsocketData ()");
-    console.log ("Data: " + event.data);
+    //console.log ("handleWebsocketData ()");    
 
     let incomingMessage=new KMessageOBject ();
-    incomingMessage.process (event);
+    if (incomingMessage.process (event.data)==false) {      
+      return;
+    }
 
     this.messageQueue.enqueue (incomingMessage);
-
-    console.log ("Currently " + this.messageQueue.getSize () + " message in the queue");
-
-    /*
-    if (this.controller) {
-      this.controller.onData (event.data);
-    }
-    */
     
-    /*
-    var JSONObject=JSON.parse (event.data);
-    
-    if (!JSONObject.data.namespace) {
-      console.log ("Internal error: incoming message does not conform to specs");  
-      return; 
+    console.log ("Routing top message in queue (" + this.messageQueue.getSize () + ") to proper source: " + incomingMessage.namespace);
+
+    if (this.reactController) {
+      this.reactController.route (incomingMessage.namespace,incomingMessage);
     }
-       
-    if (this.processWSMessage (JSONObject)===false) {    
-      this.setState({wsdata: JSONObject},() => {
-      });
-    }
-    */ 
   }
 
   /**
    * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
    */
-  send (aString) {
-    console.log ("send ("+aString+")");
+  send (aNamespace,aString) {
+    //console.log ("send ("+aNamespace+","+aString+")");
 
     let statusResult = {
       ok: true,
@@ -332,7 +322,7 @@ class KnossysConnector {
     if (this.websocket!=null) {
       if (this.isConnected ()==true) {
         try {
-          this.websocket.sendData ("root.react.init", {"data": aString});
+          this.websocket.sendData (aNamespace, {"data": aString});
         } catch (error) {
           statusResult.ok=false;
           statusResult.statusMessage=JSON.stringify (error);
@@ -352,7 +342,7 @@ class KnossysConnector {
    * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
    */
   broadcast (aString) {
-    console.log ("broadcast ("+aString+")");
+    //console.log ("broadcast ("+aString+")");
 
     let statusResult = {
       ok: true,

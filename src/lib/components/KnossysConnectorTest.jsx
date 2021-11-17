@@ -19,9 +19,10 @@ class KnossysConnectorTest extends Component {
   constructor (props) {
     super(props);
 
-    this.guidGenerator=new KGUID ();  
     this.consoleTools=new KConsoleTools ();
     this.counter=0;
+    
+    this.refId=props.connector.getReference ();
 
     this.queue=new KAbstractConsole ();
     this.queue.setQueueSize (200);
@@ -29,12 +30,13 @@ class KnossysConnectorTest extends Component {
     this.dataTools=new KDataTools ();
 
     this.state = {
-      id: this.guidGenerator.guid,
+      id: this.refId,
       lines: [],
       showTimestamps: true
     };
 
     this.ping=this.ping.bind(this);
+    this.onMessage = this.onMessage.bind(this);
   }
 
   /**
@@ -43,9 +45,7 @@ class KnossysConnectorTest extends Component {
   componentDidMount () {
     //console.log ("componentDidMount ()");
 
-    if (this.props.connector) {
-      this.props.connector.registerConnection (this.state.id);
- 
+    if (this.props.connector) { 
       let randomTimeout=this.dataTools.getRandomInt (10000)+1000;
 
       this.println ("Using random timeout of " + (randomTimeout/1000) + " seconds");
@@ -78,7 +78,14 @@ class KnossysConnectorTest extends Component {
     if (this.props.data !== prevProps.data) {
       this.println ("Data: " + this.props.data);
     }
-  }  
+  }
+
+  /**
+   * 
+   */
+  onMessage (aMessage) {
+    console.log ("onMessage ()");    
+  }    
 
   /**
    *
@@ -109,7 +116,7 @@ class KnossysConnectorTest extends Component {
     if (this.props.connector) {      
       this.println (aString);
 
-      let sendStatus=this.props.connector.send (aString);
+      let sendStatus=this.props.connector.send (this.refId,aString);
       
       if (sendStatus.ok==false) {
         this.error (sendStatus.statusMessage);
@@ -133,7 +140,7 @@ class KnossysConnectorTest extends Component {
    *
    */
   render () {
-    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
+    return (<div ref={this.refId} className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
         <div className="consoletitle">
         Knossys Drydock automated connector test
         </div>

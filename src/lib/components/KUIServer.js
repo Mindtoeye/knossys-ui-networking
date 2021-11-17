@@ -23,34 +23,43 @@ class KUIServer {
     let newMessage=new KMessageObject ();
     newMessage.process (aMessage);
 
-    let sessionObject=this.sessions.getItem (aMessage.session);
-    if (sessionObject==null) {
-      sessionObject={
+    let aSessionObject=this.sessions.getItem (newMessage.session);
+    if (aSessionObject==null) {
+      console.log ("Session " + newMessage.session + " not found, creating new one ...");
+      aSessionObject={
         socket: aSocket,
         messages: new KQueue (),
         count: 0
       };
-      this.sessions.setItem (aMessage.session,sessionObject);
+      this.sessions.setItem (newMessage.session,aSessionObject);
     }
 
-    sessionObject.messages.enqueue (aMessage);
-    sessionObject.count++;
+    aSessionObject.messages.enqueue (newMessage);
 
-    let outgoingMessage=new KMessageObject ();
-    outgoingMessage.namespace="root.react.established";
-    outgoingMessage.session=newMessage.session;
-    outgoingMessage.count=sessionObject.count++;
+    if (newMessage.namespace=="*") {
+      console.log ("Processing broadcast ...");
 
-    if (aMessage.namespace=="*") {
-      let senders=this.sessions.getItems ();
+      let sessionList=this.sessions.getItems ();
 
-      for (var sender in senders) {
-        if (senders.hasOwnProperty(sender)) {
-          let target = senders[sender];
-          target.socket.send (outgoingMessage.build ());
+      for (var sessionKey in sessionList) {
+        if (sessionList.hasOwnProperty(sessionKey)) {
+          console.log ('Broadcasting to session ' + sessionKey);
+          let sessionObject = sessionList[sessionKey];
+
+          let outgoingMessage=new KMessageObject ();
+          outgoingMessage.namespace="*";
+          outgoingMessage.session=sessionObject.session;
+          outgoingMessage.count=sessionObject.count++;
+
+          sessionObject.socket.send (outgoingMessage.build ());
         }
       }
     } else {
+      console.log ("Replying to regular session " + newMessage.session);
+      let outgoingMessage=new KMessageObject ();
+      outgoingMessage.namespace=newMessage.namespace;
+      outgoingMessage.session=newMessage.session;
+      outgoingMessage.count=aSessionObject.count++;      
       aSocket.send (outgoingMessage.build ());
     }
   }

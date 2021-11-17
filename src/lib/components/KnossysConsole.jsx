@@ -20,8 +20,8 @@ class KnossysConsole extends Component {
     super(props);
 
     this.parser=props.parser;
-    //this.prompt="conn: ? > ";
-    this.guidGenerator=new KGUID ();  
+
+    this.refId=props.connector.getReference ();
 
     this.consoleTools=new KConsoleTools ();
 
@@ -32,7 +32,7 @@ class KnossysConsole extends Component {
     this.history.setQueueSize (200);
 
     this.state = {
-      id: this.guidGenerator.guid,
+      id: this.refId,
       historyIndex: 0,
       prompt: "conn: ? > ",
       value: "",
@@ -45,6 +45,7 @@ class KnossysConsole extends Component {
     this.clearScreen = this.clearScreen.bind(this);
     this.showStatus = this.showStatus.bind(this);
     this.generateBroadcast = this.generateBroadcast.bind(this);
+    this.onMessage = this.onMessage.bind(this);
   }
 
   /**
@@ -52,12 +53,6 @@ class KnossysConsole extends Component {
    */
   componentDidMount () {
     console.log ("componentDidMount ()");
-
-    if (this.props.connector) {
-      this.props.connector.registerConnection (this.state.id);
-    } else {
-      this.println ("Error: no connector available to register connection");
-    }
 
     this.parser.addCommand ("clear", () => { this.clearScreen (); return (null); });
     this.parser.addCommand ("status", () => { this.showStatus (); return (null); });
@@ -100,6 +95,13 @@ class KnossysConsole extends Component {
         prompt: "conn: "+this.props.connector.connected+" > "
       });
     }
+  }
+
+  /**
+   * 
+   */
+  onMessage (aMessage) {
+    console.log ("onMessage ()");    
   }
 
   /**
@@ -252,7 +254,7 @@ class KnossysConsole extends Component {
    */
   send (aString) {
     if (this.props.connector) {
-      this.props.connector.send ("Hello World");
+      this.props.connector.send (this.refId,aString);
     }
   }
 
@@ -261,7 +263,7 @@ class KnossysConsole extends Component {
    */
   generateBroadcast (aString) {
     if (this.props.connector) {
-      this.props.connector.send ("Hello World");
+      this.props.connector.send ("*",aString);
     }    
   }
   
@@ -269,7 +271,7 @@ class KnossysConsole extends Component {
    *
    */
   render () {    
-    return (<div className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
+    return (<div ref={this.refId} className="genericWindow" style={{'left' : this.props.x+'px', 'top': this.props.y+'px', 'width' : this.props.width+'px', 'height': this.props.height+'px'}}>
         <div className="consoletitle">
         Knossys Drydock thin client window
         </div>

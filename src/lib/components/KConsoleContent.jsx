@@ -65,9 +65,7 @@ class KConsoleContent extends Component {
       }
     }
 
-    lineElements.push (<div key={"kconsole-line-end"} style={{ float:"left", clear: "both" }}
-      ref={this.refId}>
-    </div>);
+    lineElements.push (<div ref={this.refId} key={"kconsole-line-end"} style={{ float:"left", clear: "both" }}></div>);
 
     return (<div className="consoleContent">
       {lineElements}

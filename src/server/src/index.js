@@ -18,7 +18,7 @@ function sendMessage (aMessage) {
 
 wss.on('connection', function connection(ws, req) {
   ws.on('message', function message(data) {    
-    server.processData (this,data);
+    server.processData (this,"" + data);
   });
 });
 

@@ -17,7 +17,7 @@ export default class KNetworkEnvironment {
 	  var guidGenerator=new KGUID ();  
 	   
 	  if (KnossysSession==="-1") {
-	    KnossysSession=guidGenerator.guid;
+	    KnossysSession=guidGenerator.generate ();
 	  }
   }
 
