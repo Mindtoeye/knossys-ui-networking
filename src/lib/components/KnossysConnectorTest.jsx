@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import KGUID from './KGUID';
 import KConsoleTools from './KConsoleTools';
+import KDataTools from './KDataTools';
 import KAbstractConsole from './KAbstractConsole';
 import KConsoleContent from './KConsoleContent';
 
@@ -21,8 +22,11 @@ class KnossysConnectorTest extends Component {
     this.guidGenerator=new KGUID ();  
     this.consoleTools=new KConsoleTools ();
     this.counter=0;
+
     this.queue=new KAbstractConsole ();
     this.queue.setQueueSize (200);
+
+    this.dataTools=new KDataTools ();
 
     this.state = {
       id: this.guidGenerator.guid,
@@ -41,8 +45,12 @@ class KnossysConnectorTest extends Component {
 
     if (this.props.connector) {
       this.props.connector.registerConnection (this.state.id);
+ 
+      let randomTimeout=this.dataTools.getRandomInt (10000)+1000;
 
-      setInterval (this.ping,10000);
+      this.println ("Using random timeout of " + (randomTimeout/1000) + " seconds");
+
+      setInterval (this.ping,randomTimeout);
     } else {
       this.println ("Error: no connector available to register connection");
     }
@@ -129,7 +137,7 @@ class KnossysConnectorTest extends Component {
         <div className="consoletitle">
         Knossys Drydock automated connector test
         </div>
-        <KConsoleContent lines={this.state.lines} showtimestamps={this.state.showTimestamps} />
+        <KConsoleContent connector={this.props.connector} lines={this.state.lines} showtimestamps={this.state.showTimestamps} />
       </div>);    
   }
 }

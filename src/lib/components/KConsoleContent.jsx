@@ -10,11 +10,11 @@ class KConsoleContent extends Component {
   /**
    *
    */
-  /* 
   constructor (props) {
     super (props);
+
+    this.refId=props.connector.getReference ();
   }
-  */
 
   /**
    *
@@ -34,7 +34,7 @@ class KConsoleContent extends Component {
    *
    */
   scrollToBottom () {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+    this.refs[this.refId].scrollIntoView({ behavior: "smooth" });
   }
 
   /**
@@ -66,7 +66,7 @@ class KConsoleContent extends Component {
     }
 
     lineElements.push (<div key={"kconsole-line-end"} style={{ float:"left", clear: "both" }}
-      ref={(el) => { this.messagesEnd = el; }}>
+      ref={this.refId}>
     </div>);
 
     return (<div className="consoleContent">

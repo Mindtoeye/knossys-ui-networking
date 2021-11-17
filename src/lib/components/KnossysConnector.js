@@ -20,12 +20,14 @@ class KnossysConnector {
     this.wsdata={};
     this.wsretry=false;
 
+    this.referenceCounter=1; // 0 is reserved
+
     this.connectionTable=new KHashTable ();
     this.messageQueue=new KQueue ();
 
     this.networkConfig=new KNetworkEnvironment ();
     this.networkConfig.setSystemPort (8072);
-    this.networkConfig.setSystemRoot ("192.168.0.108");
+    this.networkConfig.setSystemRoot ("localhost");
 
     this.setupEventHandlers = this.setupEventHandlers.bind(this);
     this.handleWebsocketOpen = this.handleWebsocketOpen.bind(this);  
@@ -56,6 +58,65 @@ class KnossysConnector {
       console.log ("Disabling ...")
       this.websocket=null;
     }
+  }
+
+  /**
+    interface URL {
+      href:     USVString;
+      protocol: USVString;
+      username: USVString;
+      password: USVString;
+      host:     USVString;
+      hostname: USVString;
+      port:     USVString;
+      pathname: USVString;
+      search:   USVString;
+      hash:     USVString;
+      readonly origin: USVString;
+      readonly searchParams: URLSearchParams;
+      toJSON(): USVString;
+    }
+   */
+  setURL (aURL) {
+    console.log ("setURL ("+aURL+")");
+
+    let statusResult = {
+      ok: true,
+      statusMessage: "Send successful"
+    };
+
+    if (aURL.indexOf (":")==-1) {
+      statusResult.ok=false;
+      statusResult.statusMessage="Invalid websocket url: " + aURL;
+      return (statusResult);
+    }
+
+    let url=null;
+
+    try {
+      url=new URL (aURL);
+    }
+    catch(err) {
+      statusResult.ok=false;
+      statusResult.statusMessage="Error parsing url: " + err;
+      return (statusResult);      
+    }    
+
+    this.networkConfig.setSystemPort (url.port);
+    this.networkConfig.setSystemRoot (url.hostname);
+
+    statusResult.ok=true;
+    statusResult.statusMessage="Changed server url, you may have to reconnect for this setting to take effect";
+    return (statusResult);   
+  }
+
+  /**
+   * 
+   */
+  getReference () {
+    let ref="kref-"+this.referenceCounter;
+    this.referenceCounter++;
+    return (ref);
   }
 
   /**

@@ -59,9 +59,18 @@ class KnossysConsole extends Component {
       this.println ("Error: no connector available to register connection");
     }
 
-    this.parser.addCommand ("clear", () => {this.clearScreen (); return (null); });
-    this.parser.addCommand ("status", () => {this.showStatus (); return (null); });
-    this.parser.addCommand ("broadcast $string", (aString) => {return (this.generateBroadcast (aString));});
+    this.parser.addCommand ("clear", () => { this.clearScreen (); return (null); });
+    this.parser.addCommand ("status", () => { this.showStatus (); return (null); });
+    this.parser.addCommand ("seturl $string", (aURL) => { 
+      let result=this.props.connector.setURL (aURL); 
+      if (result.ok==false) {
+        this.error (result.statusMessage);
+      } else {
+        this.println (result.statusMessage);
+      }
+      return (null);
+    });
+    this.parser.addCommand ("broadcast $string", (aString) => { return (this.generateBroadcast (aString)); });
     this.parser.addCommand ("showtimestamps $boolean", (toggle) => { this.setState ({showTimestamps: toggle}); return ("set 'showTimestamps' to: " + toggle); });
   }
 
@@ -91,7 +100,7 @@ class KnossysConsole extends Component {
         prompt: "conn: "+this.props.connector.connected+" > "
       });
     }
-  }  
+  }
 
   /**
    * 
@@ -230,6 +239,17 @@ class KnossysConsole extends Component {
   /**
    *
    */
+  error (aLine) {
+    this.queue.error (aLine);    
+
+    this.setState({      
+      lines: this.queue.getQueue()
+    });    
+  }  
+
+  /**
+   *
+   */
   send (aString) {
     if (this.props.connector) {
       this.props.connector.send ("Hello World");
@@ -253,7 +273,7 @@ class KnossysConsole extends Component {
         <div className="consoletitle">
         Knossys Drydock thin client window
         </div>
-        <KConsoleContent lines={this.state.lines} showtimestamps={this.state.showTimestamps} />
+        <KConsoleContent connector={this.props.connector} lines={this.state.lines} showtimestamps={this.state.showTimestamps} />
         <div className="kconsole">
           <div className="kconsoleprompt">
             {this.state.prompt}
